@@ -40,28 +40,50 @@ export default class CircularProgress extends React.PureComponent {
       padding,
       renderCap,
       dashedBackground,
-      dashedTint
+      dashedTint,
+      tintProgressRightToLeft
     } = this.props;
 
+    const fillDisplay = tintProgressRightToLeft ? 100 - fill : fill
     const maxWidthCircle = backgroundWidth ? Math.max(width, backgroundWidth) : width;
     const sizeWithPadding = size / 2 + padding / 2;
     const radius = size / 2 - maxWidthCircle / 2 - padding / 2;
 
-    const currentFillAngle = (arcSweepAngle * this.clampFill(fill)) / 100;
-    const backgroundPath = this.circlePath(
-      sizeWithPadding,
-      sizeWithPadding,
-      radius,
-      tintTransparency ? 0 : currentFillAngle,
-      arcSweepAngle
-    );
-    const circlePath = this.circlePath(
-      sizeWithPadding,
-      sizeWithPadding,
-      radius,
-      0,
-      currentFillAngle
-    );
+    const currentFillAngle = (arcSweepAngle * this.clampFill(fillDisplay)) / 100;
+    let backgroundPath = null
+    let circlePath = null
+    if (tintProgressRightToLeft) {
+      backgroundPath = this.circlePath(
+          sizeWithPadding,
+          sizeWithPadding,
+          radius,
+          0,
+          arcSweepAngle
+      );
+      circlePath = this.circlePath(
+          sizeWithPadding,
+          sizeWithPadding,
+          radius,
+          currentFillAngle,
+          arcSweepAngle
+      );
+    } else {
+      backgroundPath = this.circlePath(
+          sizeWithPadding,
+          sizeWithPadding,
+          radius,
+          tintTransparency ? 0 : currentFillAngle,
+          arcSweepAngle
+      );
+      circlePath = this.circlePath(
+          sizeWithPadding,
+          sizeWithPadding,
+          radius,
+          0,
+          currentFillAngle
+      );
+    }
+
     const coordinate = this.polarToCartesian(
       sizeWithPadding,
       sizeWithPadding,
@@ -147,7 +169,8 @@ CircularProgress.propTypes = {
   padding: PropTypes.number,
   renderCap: PropTypes.func,
   dashedBackground: PropTypes.object,
-  dashedTint: PropTypes.object
+  dashedTint: PropTypes.object,
+  tintProgressRightToLeft: PropTypes.bool
 };
 
 CircularProgress.defaultProps = {
@@ -159,4 +182,5 @@ CircularProgress.defaultProps = {
   padding: 0,
   dashedBackground: { width: 0, gap: 0 },
   dashedTint: { width: 0, gap: 0 },
+  tintProgressRightToLeft: false
 };
